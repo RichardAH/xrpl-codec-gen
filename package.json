@@ -1,0 +1,26 @@
+{
+  "name": "xrpl-codec-gen",
+  "version": "1.0.0",
+  "description": "Generates a definitions.json from rippled cpp source code, preserving idiosyncrasies",
+  "main": "gen.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RichardAH/xrpl-codec-gen.git"
+  },
+  "keywords": [
+    "xrpl",
+    "ripple-binary-codec",
+    "defintions.json",
+    "hooks",
+    "xls20"
+  ],
+  "author": "Richard Holland",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RichardAH/xrpl-codec-gen/issues"
+  },
+  "homepage": "https://github.com/RichardAH/xrpl-codec-gen#readme"
+}
