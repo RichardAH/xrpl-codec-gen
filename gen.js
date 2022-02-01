@@ -98,6 +98,26 @@ console.log(`    [
       }
     ],
     [
+      "ObjectEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "ArrayEndMarker",
+      {
+        "nth": 1,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
       "hash",
       {
         "nth": 257,
@@ -215,6 +235,9 @@ const ttranslate = (inp)=>{
 
         if (inp == 'SPINAL_TAP')
             inp = 'TICKET_CANCEL'
+
+        if (inp == 'HOOK_SET')
+            inp = 'SET_HOOK'
 
         inp = inp.replaceAll('PAYCHAN', 'PAYMENT_CHANNEL')
 
