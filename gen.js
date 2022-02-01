@@ -66,9 +66,15 @@ for (let x = 0; x < hits.length; ++x)
 console.log('  },');
 console.log('  "LEDGER_ENTRY_TYPES": {')
 console.log('    "Invalid": -1,')
+
+const unhex = (x)=>{
+    if ((x + '').substr(0,2) == '0x')
+        return '' + parseInt('' + x)
+    return x
+}
 hits = [... ledgerformats_h.matchAll(/ *lt([A-Z_]+)[^\n=]*= *([^,]+),?$/mg)];
 for (let x = 0; x < hits.length; ++x)
-    console.log("    \"" + translate(hits[x][1])  + "\": " +  hits[x][2] + (x < hits.length - 1 ? ",": ""))
+    console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
 console.log('  },');
 console.log('  "FIELDS": [');
 console.log(`    [
