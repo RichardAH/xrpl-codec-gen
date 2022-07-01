@@ -173,6 +173,12 @@ const isSerialized = (t)=>{
     return 'true';
 }
 
+const isOne = (t, v)=>{
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
+        return 1 + ','
+    return v;
+}
+
 const isSigningField = (t)=>{
     if (t == 'notSigning')
         return 'false';
@@ -186,7 +192,7 @@ for (let x = 0; x < hits.length; ++x)
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
     console.log('      {')
-    console.log('        "nth": ' + hits[x][3] + ',')
+    console.log('        "nth": ' + isOne(hits[x][2], hits[x][3] + ','))
     console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
     console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
     console.log('        "isSigningField": ' + isSigningField(hits[x][5]) + ',')
