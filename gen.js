@@ -49,7 +49,10 @@ const translate = (inp)=>{
             let parts = inp.split('_');
             inp = '';
             for (x in parts)
-                inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+                if (parts[x] == 'NFTOKEN')
+                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
+                else
+                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             return inp;
         }
         return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
@@ -257,7 +260,6 @@ const ttranslate = (inp)=>{
             inp = '';
             for (x in parts)
             {
-                console.log(parts[x])
                 if (parts[x] == 'UNL')
                     inp += parts[x]
                 else if (parts[x] == 'NFTOKEN')
