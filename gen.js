@@ -257,8 +257,11 @@ const ttranslate = (inp)=>{
             inp = '';
             for (x in parts)
             {
+                console.log(parts[x])
                 if (parts[x] == 'UNL')
                     inp += parts[x]
+                else if (parts[x] == 'NFTOKEN')
+                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
                 else
                     inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             }
