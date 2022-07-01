@@ -23,7 +23,10 @@ const translate = (inp)=>{
     try
     {
         if (inp.match(/^UINT/m))
-            return inp.replace("UINT", "UInt");
+            if (inp.match(/256/m))
+                return inp.replace("UINT", "Hash");
+            else
+                return inp.replace("UINT", "UInt");
         if (inp == 'OBJECT' || inp == 'ARRAY')
             return 'ST' + inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
         if (inp == 'ACCOUNT')
