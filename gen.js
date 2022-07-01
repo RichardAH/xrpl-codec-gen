@@ -80,7 +80,12 @@ const unhex = (x)=>{
 }
 hits = [... ledgerformats_h.matchAll(/ *lt([A-Z_]+)[^\n=]*= *([^,]+),?$/mg)];
 for (let x = 0; x < hits.length; ++x)
-    console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
+    if (hits[x][1] === 'ANY')
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  -3 + (x < hits.length - 1 ? ",": ""))
+    else if (hits[x][1] === 'CHILD')
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  -2 + (x < hits.length - 1 ? ",": ""))
+    else
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
 console.log('  },');
 console.log('  "FIELDS": [');
 console.log(`    [
