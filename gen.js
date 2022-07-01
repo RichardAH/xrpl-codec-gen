@@ -23,7 +23,7 @@ const translate = (inp)=>{
     try
     {
         if (inp.match(/^UINT/m))
-            if (inp.match(/256/m))
+            if (inp.match(/256/m) || inp.match(/160/m) || inp.match(/128/m))
                 return inp.replace("UINT", "Hash");
             else
                 return inp.replace("UINT", "UInt");
