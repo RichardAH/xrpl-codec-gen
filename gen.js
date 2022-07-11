@@ -23,7 +23,10 @@ const translate = (inp)=>{
     try
     {
         if (inp.match(/^UINT/m))
-            return inp.replace("UINT", "UInt");
+            if (inp.match(/256/m) || inp.match(/160/m) || inp.match(/128/m))
+                return inp.replace("UINT", "Hash");
+            else
+                return inp.replace("UINT", "UInt");
         if (inp == 'OBJECT' || inp == 'ARRAY')
             return 'ST' + inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
         if (inp == 'ACCOUNT')
@@ -46,7 +49,10 @@ const translate = (inp)=>{
             let parts = inp.split('_');
             inp = '';
             for (x in parts)
-                inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+                if (parts[x] == 'NFTOKEN')
+                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
+                else
+                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             return inp;
         }
         return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
@@ -74,7 +80,12 @@ const unhex = (x)=>{
 }
 hits = [... ledgerformats_h.matchAll(/ *lt([A-Z_]+)[^\n=]*= *([^,]+),?$/mg)];
 for (let x = 0; x < hits.length; ++x)
-    console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
+    if (hits[x][1] === 'ANY')
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  -3 + (x < hits.length - 1 ? ",": ""))
+    else if (hits[x][1] === 'CHILD')
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  -2 + (x < hits.length - 1 ? ",": ""))
+    else
+        console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
 console.log('  },');
 console.log('  "FIELDS": [');
 console.log(`    [
@@ -170,6 +181,12 @@ const isSerialized = (t)=>{
     return 'true';
 }
 
+const isOne = (t, v)=>{
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
+        return 1 + ','
+    return v;
+}
+
 const isSigningField = (t)=>{
     if (t == 'notSigning')
         return 'false';
@@ -183,7 +200,7 @@ for (let x = 0; x < hits.length; ++x)
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
     console.log('      {')
-    console.log('        "nth": ' + hits[x][3] + ',')
+    console.log('        "nth": ' + isOne(hits[x][2], hits[x][3] + ','))
     console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
     console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
     console.log('        "isSigningField": ' + isSigningField(hits[x][5]) + ',')
@@ -250,6 +267,8 @@ const ttranslate = (inp)=>{
             {
                 if (parts[x] == 'UNL')
                     inp += parts[x]
+                else if (parts[x] == 'NFTOKEN')
+                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
                 else
                     inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             }
