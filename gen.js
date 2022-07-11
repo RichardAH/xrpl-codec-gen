@@ -18,6 +18,13 @@ let ledgerformats_h = fs.readFileSync(ledgerformats_h_fn).toString('utf-8');
 let ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
 let txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
 
+const capitalization_exceptions = {
+    "NFTOKEN": 3,
+    "UNL": 3,
+    "XCHAIN": 2,
+    "ID": 2,
+}
+
 
 const translate = (inp)=>{
     try
@@ -49,12 +56,11 @@ const translate = (inp)=>{
             let parts = inp.split('_');
             inp = '';
             for (x in parts)
-                if (parts[x] == 'NFTOKEN')
-                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
-                else if (parts[x] == 'XCHAIN')
-                    inp += parts[x].substr(0,2).toUpperCase() + parts[x].substr(2).toLowerCase();
-                else
-                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+              if (capitalization_exceptions[parts[x]] != null) {
+                  const substrBreak = capitalization_exceptions[parts[x]]
+                  inp += parts[x].substr(0,substrBreak).toUpperCase() + parts[x].substr(substrBreak).toLowerCase();
+              } else
+                  inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             return inp;
         }
         return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
@@ -267,14 +273,11 @@ const ttranslate = (inp)=>{
             inp = '';
             for (x in parts)
             {
-                if (parts[x] == 'UNL')
-                    inp += parts[x]
-                else if (parts[x] == 'NFTOKEN')
-                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
-                else if (parts[x] == 'XCHAIN')
-                    inp += parts[x].substr(0,2).toUpperCase() + parts[x].substr(2).toLowerCase();
-                else
-                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+              if (capitalization_exceptions[parts[x]] != null) {
+                const substrBreak = capitalization_exceptions[parts[x]]
+                inp += parts[x].substr(0,substrBreak).toUpperCase() + parts[x].substr(substrBreak).toLowerCase();
+              } else
+                inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             }
             return inp;
         }
