@@ -211,7 +211,7 @@ for (let x = 0; x < hits.length; ++x)
 
 console.log('  ],')
 console.log('  "TRANSACTION_RESULTS": {')
-ter_h = (''+ter_h).replaceAll('[[maybe_unused]]', '')
+ter_h = (''+ter_h).replace(/[[maybe_unused]]/g, '')
 
 hits = [... ter_h.matchAll(/^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/mg) ]
 let upto = -1;
@@ -256,7 +256,7 @@ const ttranslate = (inp)=>{
         if (inp == 'HOOK_SET')
             inp = 'SET_HOOK'
 
-        inp = inp.replaceAll('PAYCHAN', 'PAYMENT_CHANNEL')
+        inp = inp.replace(/PAYCHAN/g, 'PAYMENT_CHANNEL')
 
 
         if (inp.match(/_/))
