@@ -202,8 +202,8 @@ const isSigningField = (t)=>{
 }
 
 hits = [... sfield_cpp.matchAll(
-    /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*, *"([^\"\n ]+)" *, *([^, \n]+) *, *([0-9]+)(,.*?(notSigning))?/mg) ]
-for (let x = 0; x < hits.length; ++x)
+    /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/mg) ]
+    for (let x = 0; x < hits.length; ++x)
 {
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
