@@ -3,7 +3,7 @@ Generate a definitions.json for ripple-binary-codec from a rippled source folder
 
 ## Usage
 ```
-node gen.js /your/path/to/rippled/src/ripple/ >> definitions.json
+node gen.js /your/path/to/rippled/src/ripple/ > definitions.json
 ```
 
 ## Example Output
