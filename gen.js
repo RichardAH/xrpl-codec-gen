@@ -23,6 +23,7 @@ const capitalization_exceptions = {
     "UNL": "UNL",
     "XCHAIN": "XChain",
     "ID": "ID",
+    "AMM": "AMM",
 }
 
 
