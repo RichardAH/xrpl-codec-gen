@@ -19,10 +19,10 @@ let ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
 let txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
 
 const capitalization_exceptions = {
-    "NFTOKEN": 3,
-    "UNL": 3,
-    "XCHAIN": 2,
-    "ID": 2,
+    "NFTOKEN": "NFToken",
+    "UNL": "UNL",
+    "XCHAIN": "XChain",
+    "ID": "ID",
 }
 
 
@@ -57,8 +57,7 @@ const translate = (inp)=>{
             inp = '';
             for (x in parts)
               if (capitalization_exceptions[parts[x]] != null) {
-                  const substrBreak = capitalization_exceptions[parts[x]]
-                  inp += parts[x].substr(0,substrBreak).toUpperCase() + parts[x].substr(substrBreak).toLowerCase();
+                  inp += capitalization_exceptions[parts[x]];
               } else
                   inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             return inp;
@@ -274,8 +273,7 @@ const ttranslate = (inp)=>{
             for (x in parts)
             {
               if (capitalization_exceptions[parts[x]] != null) {
-                const substrBreak = capitalization_exceptions[parts[x]]
-                inp += parts[x].substr(0,substrBreak).toUpperCase() + parts[x].substr(substrBreak).toLowerCase();
+                inp += capitalization_exceptions[parts[x]];;
               } else
                 inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             }
