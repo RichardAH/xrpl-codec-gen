@@ -18,6 +18,14 @@ let ledgerformats_h = fs.readFileSync(ledgerformats_h_fn).toString('utf-8');
 let ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
 let txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
 
+const capitalization_exceptions = {
+    "NFTOKEN": "NFToken",
+    "UNL": "UNL",
+    "XCHAIN": "XChain",
+    "ID": "ID",
+    "AMM": "AMM",
+}
+
 
 const translate = (inp)=>{
     try
@@ -49,12 +57,10 @@ const translate = (inp)=>{
             let parts = inp.split('_');
             inp = '';
             for (x in parts)
-                if (parts[x] == 'AMM')
-                    inp += parts[x].substr(0,3).toUpperCase();
-                else if (parts[x] == 'NFTOKEN')
-                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
-                else
-                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+              if (capitalization_exceptions[parts[x]] != null) {
+                  inp += capitalization_exceptions[parts[x]];
+              } else
+                  inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
             return inp;
         }
         return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
@@ -196,8 +202,8 @@ const isSigningField = (t)=>{
 }
 
 hits = [... sfield_cpp.matchAll(
-    /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*, *"([^\"\n ]+)" *, *([^, \n]+) *, *([0-9]+)(,.*?(notSigning))?/mg) ]
-for (let x = 0; x < hits.length; ++x)
+    /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/mg) ]
+    for (let x = 0; x < hits.length; ++x)
 {
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
@@ -267,14 +273,11 @@ const ttranslate = (inp)=>{
             inp = '';
             for (x in parts)
             {
-                if (parts[x] == 'UNL')
-                    inp += parts[x]
-                else if (parts[x] == 'AMM')
-                    inp += parts[x].substr(0,3).toUpperCase();
-                else if (parts[x] == 'NFTOKEN')
-                    inp += parts[x].substr(0,3).toUpperCase() + parts[x].substr(3).toLowerCase();
-                else
-                    inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+              if (capitalization_exceptions[parts[x]] != null) {
+                inp += capitalization_exceptions[parts[x]];;
+              } else
+                inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+
             }
             return inp;
         }
