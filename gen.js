@@ -277,6 +277,7 @@ const ttranslate = (inp)=>{
                 inp += capitalization_exceptions[parts[x]];;
               } else
                 inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+
             }
             return inp;
         }
