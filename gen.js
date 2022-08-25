@@ -82,8 +82,11 @@ console.log('  "LEDGER_ENTRY_TYPES": {')
 console.log('    "Invalid": -1,')
 
 const unhex = (x)=>{
-    if ((x + '').substr(0,2) == '0x')
-        return '' + parseInt('' + x)
+    x = ('' + x).trim();
+    if (x.substr(0,2) == '0x')
+        return '' + parseInt(x)
+    if (x.substr(0,1) == "'" && x.length == 3)
+        return x.charCodeAt(1);
     return x
 }
 hits = [... ledgerformats_h.matchAll(/ *lt([A-Z_]+)[^\n=]*= *([^,]+),?$/mg)];
