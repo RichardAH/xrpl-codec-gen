@@ -37,6 +37,8 @@ const translate = (inp)=>{
                 return inp.replace("UINT", "UInt");
         if (inp == 'OBJECT' || inp == 'ARRAY')
             return 'ST' + inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
+        if (inp == 'AMM')
+            return inp;
         if (inp == 'ACCOUNT')
             return 'AccountID';
         if (inp == 'LEDGERENTRY')
