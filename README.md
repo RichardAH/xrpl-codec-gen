@@ -1,12 +1,23 @@
 # xrpl-codec-gen
+
 Generate a definitions.json for ripple-binary-codec from a rippled source folder.
 
 ## Usage
+
+### JavaScript
+
 ```
 node gen.js /your/path/to/rippled/src/ripple/ > definitions.json
 ```
 
+### Python
+
+```
+python gen.py /your/path/to/rippled/src/ripple/ > definitions.json
+```
+
 ## Example Output
+
 ```json
 {
   "TYPES": {
