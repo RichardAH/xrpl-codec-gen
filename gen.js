@@ -224,7 +224,7 @@ hits = [... sfield_cpp.matchAll(
 
 console.log('  ],')
 console.log('  "TRANSACTION_RESULTS": {')
-ter_h = (''+ter_h).replace(/[[maybe_unused]]/g, '')
+ter_h = (''+ter_h).replace("[[maybe_unused]]", '')
 
 hits = [... ter_h.matchAll(/^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/mg) ]
 let upto = -1;
@@ -269,7 +269,7 @@ const ttranslate = (inp)=>{
         if (inp == 'HOOK_SET')
             inp = 'SET_HOOK'
 
-        inp = inp.replace(/PAYCHAN/g, 'PAYMENT_CHANNEL')
+        inp = inp.replace("PAYCHAN", 'PAYMENT_CHANNEL')
 
 
         if (inp.match(/_/))
