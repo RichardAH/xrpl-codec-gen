@@ -4,6 +4,9 @@ if (process.argv.length != 3)
     process.exit(1);
 }
 
+////////////////////////////////////////////////////////////////////////
+//  Get all necessary files from rippled
+////////////////////////////////////////////////////////////////////////
 const sfield_h_fn = process.argv[2] + '/protocol/SField.h'
 const sfield_cpp_fn = process.argv[2] + '/protocol/impl/SField.cpp'
 const ledgerformats_h_fn = process.argv[2] + '/protocol/LedgerFormats.h'
@@ -12,11 +15,11 @@ const txformats_h_fn = process.argv[2] + '/protocol/TxFormats.h'
 
 const fs = require('fs')
 
-let sfield_h = fs.readFileSync(sfield_h_fn).toString('utf-8');
-let sfield_cpp = fs.readFileSync(sfield_cpp_fn).toString('utf-8');
-let ledgerformats_h = fs.readFileSync(ledgerformats_h_fn).toString('utf-8');
-let ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
-let txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
+const sfield_h = fs.readFileSync(sfield_h_fn).toString('utf-8');
+const sfield_cpp = fs.readFileSync(sfield_cpp_fn).toString('utf-8');
+const ledgerformats_h = fs.readFileSync(ledgerformats_h_fn).toString('utf-8');
+const ter_h = fs.readFileSync(ter_h_fn).toString('utf-8')
+const txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
 
 const capitalization_exceptions = {
     "NFTOKEN": "NFToken",
@@ -26,8 +29,8 @@ const capitalization_exceptions = {
     "AMM": "AMM",
 }
 
-
-const translate = (inp)=>{
+// Translate from rippled string format to what the binary codecs expect
+function translate(inp) {
     try
     {
         if (inp.match(/^UINT/m))
@@ -54,23 +57,22 @@ const translate = (inp)=>{
         if (inp == 'PAYCHAN')
             return 'PayChannel';
 
-        if (inp.match(/_/))
-        {
-            let parts = inp.split('_');
-            inp = '';
-            for (x in parts)
-              if (capitalization_exceptions[parts[x]] != null) {
-                  inp += capitalization_exceptions[parts[x]];
-              } else
-                  inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
-            return inp;
-        }
-        return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
+        const parts = inp.split('_');
+        let result = '';
+        for (x in parts)
+            if (capitalization_exceptions[parts[x]] != null) {
+                result += capitalization_exceptions[parts[x]];
+            } else
+                result += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+        return result;
     } catch (e) {
         console.log(e, 'inp="' + inp + '"')
     }
 };
 
+////////////////////////////////////////////////////////////////////////
+//  Serialized type processing
+////////////////////////////////////////////////////////////////////////
 console.log('{')
 console.log('  "TYPES": {')
 console.log('    "Done": -1,');
@@ -80,6 +82,10 @@ for (let x = 0; x < hits.length; ++x)
     console.log("    \"" + translate(hits[x][1]) + "\": " +  hits[x][2] + (x < hits.length - 1 ? ",": ""))
 
 console.log('  },');
+
+////////////////////////////////////////////////////////////////////////
+//  Ledger entry type processing
+////////////////////////////////////////////////////////////////////////
 console.log('  "LEDGER_ENTRY_TYPES": {')
 console.log('    "Invalid": -1,')
 
@@ -100,7 +106,12 @@ for (let x = 0; x < hits.length; ++x)
     else
         console.log("    \"" + translate(hits[x][1])  + "\": " +  unhex(hits[x][2]) + (x < hits.length - 1 ? ",": ""))
 console.log('  },');
+
+////////////////////////////////////////////////////////////////////////
+//  SField processing
+////////////////////////////////////////////////////////////////////////
 console.log('  "FIELDS": [');
+// The ones that are harder to parse directly from SField.cpp
 console.log(`    [
       "Generic",
       {
@@ -206,6 +217,7 @@ const isSigningField = (t)=>{
     return 'true';
 }
 
+// Parse SField.cpp for all the SFields and their serialization info
 hits = [... sfield_cpp.matchAll(
     /^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/mg) ]
     for (let x = 0; x < hits.length; ++x)
@@ -223,10 +235,14 @@ hits = [... sfield_cpp.matchAll(
 }
 
 console.log('  ],')
-console.log('  "TRANSACTION_RESULTS": {')
-ter_h = (''+ter_h).replace("[[maybe_unused]]", '')
 
-hits = [... ter_h.matchAll(/^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/mg) ]
+////////////////////////////////////////////////////////////////////////
+//  TER code processing
+////////////////////////////////////////////////////////////////////////
+console.log('  "TRANSACTION_RESULTS": {')
+const cleaned_ter_h = (''+ter_h).replace("[[maybe_unused]]", '')
+
+hits = [... cleaned_ter_h.matchAll(/^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/mg) ]
 let upto = -1;
 let last = ""
 for (let x = 0; x < hits.length; ++x)
@@ -245,10 +261,15 @@ for (let x = 0; x < hits.length; ++x)
 }
 
 console.log('  },');
+
+////////////////////////////////////////////////////////////////////////
+//  Transaction type processing
+////////////////////////////////////////////////////////////////////////
 console.log('  "TRANSACTION_TYPES": {');
 console.log('    "Invalid": -1,');
 
-const ttranslate = (inp)=>{
+// Translate TX types from rippled names to the actual string names
+function translate_tx_names(inp) {
     try
     {
         if (inp == 'REGULAR_KEY_SET')
@@ -271,30 +292,26 @@ const ttranslate = (inp)=>{
 
         inp = inp.replace("PAYCHAN", 'PAYMENT_CHANNEL')
 
-
-        if (inp.match(/_/))
+        const parts = inp.split('_');
+        let result = '';
+        for (x in parts)
         {
-            let parts = inp.split('_');
-            inp = '';
-            for (x in parts)
-            {
-              if (capitalization_exceptions[parts[x]] != null) {
-                inp += capitalization_exceptions[parts[x]];;
-              } else
-                inp += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
+            if (capitalization_exceptions[parts[x]] != null) {
+            result += capitalization_exceptions[parts[x]];;
+            } else
+            result += parts[x].substr(0,1).toUpperCase() + parts[x].substr(1).toLowerCase();
 
-            }
-            return inp;
         }
-        return inp.substr(0,1).toUpperCase() + inp.substr(1).toLowerCase();
+        return result;
     } catch (e) {
         console.log(e, 'inp="' + inp + '"')
     }
 };
+
 hits = [ ... txformats_h.matchAll(/^ *tt([A-Z_]+) *(\[\[[^\]]+\]\])? *= *([0-9]+) *,?.*$/mg) ]
 for (let x = 0; x < hits.length; ++x)
 {
-    console.log('    "' + ttranslate(hits[x][1]) + '": ' + hits[x][3] + (x < hits.length - 1 ? ',' : ''));
+    console.log('    "' + translate_tx_names(hits[x][1]) + '": ' + hits[x][3] + (x < hits.length - 1 ? ',' : ''));
 }
 
 console.log('  }');

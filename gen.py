@@ -1,13 +1,25 @@
 import sys
 import re
 
+CAPITALIZATION_EXCEPTIONS = {
+    "NFTOKEN": "NFToken",
+    "UNL": "UNL",
+    "XCHAIN": "XChain",
+    "ID": "ID",
+    "AMM": "AMM",
+}
+
 if len(sys.argv) != 2:
     print("Usage: python " + sys.argv[0] + " path/to/rippled/src/ripple/")
     sys.exit(1)
 
+########################################################################
+#  Get all necessary files from rippled
+########################################################################
+
 
 def read_file(filename):
-    with open(filename) as f:
+    with open(filename, "r") as f:
         return f.read()
 
 
@@ -23,17 +35,9 @@ ledgerformats_h = read_file(ledgerformats_h_fn)
 ter_h = read_file(ter_h_fn)
 txformats_h = read_file(txformats_h_fn)
 
-capitalization_exceptions = {
-    "NFTOKEN": "NFToken",
-    "UNL": "UNL",
-    "XCHAIN": "XChain",
-    "ID": "ID",
-    "AMM": "AMM",
-}
 
-
+# Translate from rippled string format to what the binary codecs expect
 def translate(inp):
-    inp_pattern = re.compile(inp)
     if re.match(r"^UINT", inp):
         if re.search(r"256|160|128", inp):
             return inp.replace("UINT", "Hash")
@@ -56,18 +60,19 @@ def translate(inp):
     if inp == "PAYCHAN":
         return "PayChannel"
 
-    if "_" in inp:
-        parts = inp.split("_")
-        inp = ""
-        for part in parts:
-            if part in capitalization_exceptions:
-                inp += capitalization_exceptions[part]
-            else:
-                inp += part[0:1].upper() + part[1:].lower()
-        return inp
-    return inp[0:1].upper() + inp[1:].lower()
+    parts = inp.split("_")
+    result = ""
+    for part in parts:
+        if part in CAPITALIZATION_EXCEPTIONS:
+            result += CAPITALIZATION_EXCEPTIONS[part]
+        else:
+            result += part[0:1].upper() + part[1:].lower()
+    return result
 
 
+########################################################################
+#  Serialized type processing
+########################################################################
 print("{")
 print('  "TYPES": {')
 print('    "Done": -1,')
@@ -83,6 +88,10 @@ for x in range(len(type_hits)):
     )
 
 print("  },")
+
+########################################################################
+#  Ledger entry type processing
+########################################################################
 print('  "LEDGER_ENTRY_TYPES": {')
 print('    "Invalid": -1,')
 
@@ -122,7 +131,13 @@ for x in range(len(lt_hits)):
             + ("," if x < len(lt_hits) - 1 else "")
         )
 print("  },")
+
+
+########################################################################
+#  SField processing
+########################################################################
 print('  "FIELDS": [')
+# The ones that are harder to parse directly from SField.cpp
 print(
     """    [
       "Generic",
@@ -231,55 +246,65 @@ def isSigningField(t):
     return "true"
 
 
-hits = re.findall(
+# Parse SField.cpp for all the SFields and their serialization info
+sfield_hits = re.findall(
     r'^ *CONSTRUCT_[^\_]+_SFIELD *\( *[^,\n]*,[ \n]*"([^\"\n ]+)"[ \n]*,[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?',
     sfield_cpp,
     re.MULTILINE,
 )
-for x in range(len(hits)):
+for x in range(len(sfield_hits)):
     print("    [")
-    print('      "' + hits[x][0] + '",')
+    print('      "' + sfield_hits[x][0] + '",')
     print("      {")
-    print('        "nth": ' + isOne(hits[x][1], hits[x][2] + ","))
-    print('        "isVLEncoded": ' + isVLEncoded(hits[x][1]) + ",")
-    print('        "isSerialized": ' + isSerialized(hits[x][1]) + ",")
-    print('        "isSigningField": ' + isSigningField(hits[x][4]) + ",")
-    print('        "type": "' + translate(hits[x][1]) + '"')
+    print('        "nth": ' + isOne(sfield_hits[x][1], sfield_hits[x][2] + ","))
+    print('        "isVLEncoded": ' + isVLEncoded(sfield_hits[x][1]) + ",")
+    print('        "isSerialized": ' + isSerialized(sfield_hits[x][1]) + ",")
+    print('        "isSigningField": ' + isSigningField(sfield_hits[x][4]) + ",")
+    print('        "type": "' + translate(sfield_hits[x][1]) + '"')
     print("      }")
-    print("    ]" + ("," if x < len(hits) - 1 else ""))
+    print("    ]" + ("," if x < len(sfield_hits) - 1 else ""))
 
 print("  ],")
+
+########################################################################
+#  TER code processing
+########################################################################
 print('  "TRANSACTION_RESULTS": {')
 ter_h = str(ter_h).replace("[[maybe_unused]]", "")
 
-hits = re.findall(
+ter_code_hits = re.findall(
     r"^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$",
     ter_h,
     re.MULTILINE,
 )
 upto = -1
 last = ""
-for x in range(len(hits)):
-    # print(hits[x])
-    if hits[x][3] != "":
-        upto = int(hits[x][3])
 
-    current = hits[x][1]
+for x in range(len(ter_code_hits)):
+    if ter_code_hits[x][3] != "":
+        upto = int(ter_code_hits[x][3])
+
+    current = ter_code_hits[x][1]
     if current != last and last != "":
         print("")
         pass
     last = current
 
-    print('    "' + hits[x][0] + '": ' + str(upto) + ("," if x < len(hits) - 1 else ""))
+    print('    "' + ter_code_hits[x][0] + '": ' + str(upto) + ("," if x < len(ter_code_hits) - 1 else ""))
 
     upto += 1
 
 print("  },")
+
+########################################################################
+#  Transaction type processing
+########################################################################
 print('  "TRANSACTION_TYPES": {')
 print('    "Invalid": -1,')
 
 
-def ttranslate(inp):
+# Translate TX types from rippled names to the actual string names
+def translate_tx_types(inp):
     if inp == "REGULAR_KEY_SET":
         inp = "SET_REGULAR_KEY"
 
@@ -304,8 +329,8 @@ def ttranslate(inp):
         parts = inp.split("_")
         inp = ""
         for part in parts:
-            if part in capitalization_exceptions:
-                inp += capitalization_exceptions[part]
+            if part in CAPITALIZATION_EXCEPTIONS:
+                inp += CAPITALIZATION_EXCEPTIONS[part]
             else:
                 inp += part[0:1].upper() + part[1:].lower()
         return inp
@@ -318,7 +343,7 @@ hits = re.findall(
 for x in range(len(hits)):
     print(
         '    "'
-        + ttranslate(hits[x][0])
+        + translate_tx_types(hits[x][0])
         + '": '
         + hits[x][2]
         + ("," if x < len(hits) - 1 else "")
