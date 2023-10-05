@@ -3,6 +3,7 @@ import re
 
 CAPITALIZATION_EXCEPTIONS = {
     "NFTOKEN": "NFToken",
+    "URITOKEN": "URIToken",
     "UNL": "UNL",
     "XCHAIN": "XChain",
     "ID": "ID",
@@ -59,6 +60,8 @@ def translate(inp):
         return "DirectoryNode"
     if inp == "PAYCHAN":
         return "PayChannel"
+    if inp == "URI_TOKEN":
+        return "URIToken"
 
     parts = inp.split("_")
     result = ""
