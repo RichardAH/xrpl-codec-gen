@@ -24,6 +24,7 @@ const txformats_h = fs.readFileSync(txformats_h_fn).toString('utf-8');
 const capitalization_exceptions = {
     "NFTOKEN": "NFToken",
     "URITOKEN": "URIToken",
+    "URI": "URI",
     "UNL": "UNL",
     "XCHAIN": "XChain",
     "ID": "ID",
@@ -57,8 +58,6 @@ function translate(inp) {
             return 'DirectoryNode';
         if (inp == 'PAYCHAN')
             return 'PayChannel';
-        if (inp == 'URI_TOKEN')
-            return 'URIToken';
 
         const parts = inp.split('_');
         let result = '';
