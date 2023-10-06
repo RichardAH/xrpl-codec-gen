@@ -3,6 +3,8 @@ import re
 
 CAPITALIZATION_EXCEPTIONS = {
     "NFTOKEN": "NFToken",
+    "URITOKEN": "URIToken",
+    "URI": "URI",
     "UNL": "UNL",
     "XCHAIN": "XChain",
     "ID": "ID",
