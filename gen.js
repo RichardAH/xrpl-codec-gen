@@ -203,20 +203,16 @@ const isVLEncoded = (t)=>{
 }
 
 const isSerialized = (t)=>{
-    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION')
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
         return 'false';
     return 'true';
-}
-
-const isOne = (t, v)=>{
-    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
-        return 1 + ','
-    return v;
 }
 
 const isSigningField = (t)=>{
     if (t == 'notSigning')
         return 'false';
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
+      return 'false';
     return 'true';
 }
 
@@ -228,7 +224,7 @@ hits = [... sfield_cpp.matchAll(
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
     console.log('      {')
-    console.log('        "nth": ' + isOne(hits[x][2], hits[x][3] + ','))
+    console.log('        "nth": ' + hits[x][3] + ',')
     console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
     console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
     console.log('        "isSigningField": ' + isSigningField(hits[x][5]) + ',')
