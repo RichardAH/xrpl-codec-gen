@@ -232,19 +232,15 @@ def isVLEncoded(t):
 
 
 def isSerialized(t):
-    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION":
+    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
         return "false"
     return "true"
 
 
-def isOne(t, v):
-    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
-        return "1,"
-    return v
-
-
 def isSigningField(t):
     if t == "notSigning":
+        return "false"
+    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
         return "false"
     return "true"
 
@@ -259,7 +255,7 @@ for x in range(len(sfield_hits)):
     print("    [")
     print('      "' + sfield_hits[x][0] + '",')
     print("      {")
-    print('        "nth": ' + isOne(sfield_hits[x][1], sfield_hits[x][2] + ","))
+    print('        "nth": ' + sfield_hits[x][2] + ",")
     print('        "isVLEncoded": ' + isVLEncoded(sfield_hits[x][1]) + ",")
     print('        "isSerialized": ' + isSerialized(sfield_hits[x][1]) + ",")
     print('        "isSigningField": ' + isSigningField(sfield_hits[x][4]) + ",")
