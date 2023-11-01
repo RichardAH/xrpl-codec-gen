@@ -7,6 +7,7 @@ CAPITALIZATION_EXCEPTIONS = {
     "URI": "URI",
     "UNL": "UNL",
     "XCHAIN": "XChain",
+    "DID": "DID",
     "ID": "ID",
     "AMM": "AMM",
 }
