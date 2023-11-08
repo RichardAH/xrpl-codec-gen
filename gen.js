@@ -80,9 +80,12 @@ console.log('{')
 console.log('  "TYPES": {')
 console.log('    "Done": -1,');
 
-let hits = [... sfield_h.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/mg)];
-for (let x = 0; x < hits.length; ++x)
+let hits = [... sfield_h.matchAll(/^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/mg)];
+if (hits.length === 0)
+    hits = [... sfield_h.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/mg)];
+for (let x = 0; x < hits.length; ++x) {
     console.log("    \"" + translate(hits[x][1]) + "\": " +  hits[x][2] + (x < hits.length - 1 ? ",": ""))
+}
 
 console.log('  },');
 

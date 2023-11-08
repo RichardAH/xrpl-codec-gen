@@ -80,7 +80,13 @@ print("{")
 print('  "TYPES": {')
 print('    "Done": -1,')
 
-type_hits = re.findall(r"^ *STI_([^ ]*?) *= *([0-9-]+) *,?$", sfield_h, re.MULTILINE)
+type_hits = re.findall(
+    r"^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$", sfield_h, re.MULTILINE
+)
+if len(type_hits) == 0:
+    type_hits = re.findall(
+        r"^ *STI_([^ ]*?) *= *([0-9-]+) *,?$", sfield_h, re.MULTILINE
+    )
 for x in range(len(type_hits)):
     print(
         '    "'
@@ -289,7 +295,13 @@ for x in range(len(ter_code_hits)):
         pass
     last = current
 
-    print('    "' + ter_code_hits[x][0] + '": ' + str(upto) + ("," if x < len(ter_code_hits) - 1 else ""))
+    print(
+        '    "'
+        + ter_code_hits[x][0]
+        + '": '
+        + str(upto)
+        + ("," if x < len(ter_code_hits) - 1 else "")
+    )
 
     upto += 1
 
