@@ -211,8 +211,8 @@ const isSerialized = (t)=>{
     return 'true';
 }
 
-const isSigningField = (t)=>{
-    if (t == 'notSigning')
+const isSigningField = (t, notSigningField)=>{
+    if (notSigningField == 'notSigning')
         return 'false';
     if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
       return 'false';
@@ -230,7 +230,7 @@ hits = [... sfield_cpp.matchAll(
     console.log('        "nth": ' + hits[x][3] + ',')
     console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
     console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
-    console.log('        "isSigningField": ' + isSigningField(hits[x][5]) + ',')
+    console.log('        "isSigningField": ' + isSigningField(hits[x][2], hits[x][5]) + ',')
     console.log('        "type": "' + translate(hits[x][2]) + '"')
     console.log('      }')
     console.log('    ]' + (x < hits.length - 1 ? ',' : ''));

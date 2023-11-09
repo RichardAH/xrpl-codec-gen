@@ -243,8 +243,8 @@ def isSerialized(t):
     return "true"
 
 
-def isSigningField(t):
-    if t == "notSigning":
+def isSigningField(t, notSigningField):
+    if notSigningField == "notSigning":
         return "false"
     if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
         return "false"
@@ -264,7 +264,11 @@ for x in range(len(sfield_hits)):
     print('        "nth": ' + sfield_hits[x][2] + ",")
     print('        "isVLEncoded": ' + isVLEncoded(sfield_hits[x][1]) + ",")
     print('        "isSerialized": ' + isSerialized(sfield_hits[x][1]) + ",")
-    print('        "isSigningField": ' + isSigningField(sfield_hits[x][4]) + ",")
+    print(
+        '        "isSigningField": '
+        + isSigningField(sfield_hits[x][1], sfield_hits[x][4])
+        + ","
+    )
     print('        "type": "' + translate(sfield_hits[x][1]) + '"')
     print("      }")
     print("    ]" + ("," if x < len(sfield_hits) - 1 else ""))
