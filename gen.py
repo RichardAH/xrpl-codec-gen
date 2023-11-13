@@ -80,7 +80,13 @@ print("{")
 print('  "TYPES": {')
 print('    "Done": -1,')
 
-type_hits = re.findall(r"^ *STI_([^ ]*?) *= *([0-9-]+) *,?$", sfield_h, re.MULTILINE)
+type_hits = re.findall(
+    r"^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$", sfield_h, re.MULTILINE
+)
+if len(type_hits) == 0:
+    type_hits = re.findall(
+        r"^ *STI_([^ ]*?) *= *([0-9-]+) *,?$", sfield_h, re.MULTILINE
+    )
 for x in range(len(type_hits)):
     print(
         '    "'
@@ -232,19 +238,15 @@ def isVLEncoded(t):
 
 
 def isSerialized(t):
-    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION":
+    if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
         return "false"
     return "true"
 
 
-def isOne(t, v):
+def isSigningField(t, notSigningField):
+    if notSigningField == "notSigning":
+        return "false"
     if t == "LEDGERENTRY" or t == "TRANSACTION" or t == "VALIDATION" or t == "METADATA":
-        return "1,"
-    return v
-
-
-def isSigningField(t):
-    if t == "notSigning":
         return "false"
     return "true"
 
@@ -259,10 +261,14 @@ for x in range(len(sfield_hits)):
     print("    [")
     print('      "' + sfield_hits[x][0] + '",')
     print("      {")
-    print('        "nth": ' + isOne(sfield_hits[x][1], sfield_hits[x][2] + ","))
+    print('        "nth": ' + sfield_hits[x][2] + ",")
     print('        "isVLEncoded": ' + isVLEncoded(sfield_hits[x][1]) + ",")
     print('        "isSerialized": ' + isSerialized(sfield_hits[x][1]) + ",")
-    print('        "isSigningField": ' + isSigningField(sfield_hits[x][4]) + ",")
+    print(
+        '        "isSigningField": '
+        + isSigningField(sfield_hits[x][1], sfield_hits[x][4])
+        + ","
+    )
     print('        "type": "' + translate(sfield_hits[x][1]) + '"')
     print("      }")
     print("    ]" + ("," if x < len(sfield_hits) - 1 else ""))
@@ -293,7 +299,13 @@ for x in range(len(ter_code_hits)):
         pass
     last = current
 
-    print('    "' + ter_code_hits[x][0] + '": ' + str(upto) + ("," if x < len(ter_code_hits) - 1 else ""))
+    print(
+        '    "'
+        + ter_code_hits[x][0]
+        + '": '
+        + str(upto)
+        + ("," if x < len(ter_code_hits) - 1 else "")
+    )
 
     upto += 1
 

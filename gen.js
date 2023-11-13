@@ -80,9 +80,12 @@ console.log('{')
 console.log('  "TYPES": {')
 console.log('    "Done": -1,');
 
-let hits = [... sfield_h.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/mg)];
-for (let x = 0; x < hits.length; ++x)
+let hits = [... sfield_h.matchAll(/^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/mg)];
+if (hits.length === 0)
+    hits = [... sfield_h.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/mg)];
+for (let x = 0; x < hits.length; ++x) {
     console.log("    \"" + translate(hits[x][1]) + "\": " +  hits[x][2] + (x < hits.length - 1 ? ",": ""))
+}
 
 console.log('  },');
 
@@ -203,20 +206,16 @@ const isVLEncoded = (t)=>{
 }
 
 const isSerialized = (t)=>{
-    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION')
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
         return 'false';
     return 'true';
 }
 
-const isOne = (t, v)=>{
-    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
-        return 1 + ','
-    return v;
-}
-
-const isSigningField = (t)=>{
-    if (t == 'notSigning')
+const isSigningField = (t, notSigningField)=>{
+    if (notSigningField == 'notSigning')
         return 'false';
+    if (t == 'LEDGERENTRY' || t == 'TRANSACTION' || t == 'VALIDATION' || t == 'METADATA')
+      return 'false';
     return 'true';
 }
 
@@ -228,10 +227,10 @@ hits = [... sfield_cpp.matchAll(
     console.log('    [');
     console.log('      "' + hits[x][1] + '",')
     console.log('      {')
-    console.log('        "nth": ' + isOne(hits[x][2], hits[x][3] + ','))
+    console.log('        "nth": ' + hits[x][3] + ',')
     console.log('        "isVLEncoded": ' + isVLEncoded(hits[x][2]) + ',')
     console.log('        "isSerialized": ' + isSerialized(hits[x][2]) + ',')
-    console.log('        "isSigningField": ' + isSigningField(hits[x][5]) + ',')
+    console.log('        "isSigningField": ' + isSigningField(hits[x][2], hits[x][5]) + ',')
     console.log('        "type": "' + translate(hits[x][2]) + '"')
     console.log('      }')
     console.log('    ]' + (x < hits.length - 1 ? ',' : ''));
